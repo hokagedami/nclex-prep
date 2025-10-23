@@ -1,6 +1,10 @@
 # Frontend Dockerfile - Build Stage
 FROM node:18-alpine AS build
 
+# Accept API URL as build argument
+ARG VITE_API_URL
+ENV VITE_API_URL=$VITE_API_URL
+
 WORKDIR /app
 
 # Copy package files
@@ -12,7 +16,7 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build the app
+# Build the app with environment variable
 RUN npm run build
 
 # Production Stage

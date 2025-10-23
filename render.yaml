@@ -26,6 +26,8 @@ services:
         value: 3000
       - key: DB_PROVIDER
         value: postgresql
+      - key: FRONTEND_URL
+        value: https://nclex-frontend.onrender.com
     buildFilter:
       paths:
         - backend/**
@@ -41,10 +43,7 @@ services:
     branch: main
     envVars:
       - key: VITE_API_URL
-        fromService:
-          type: web
-          name: nclex-backend
-          envVarKey: RENDER_EXTERNAL_URL
+        value: https://nclex-backend.onrender.com/api
     buildFilter:
       paths:
         - frontend/**
