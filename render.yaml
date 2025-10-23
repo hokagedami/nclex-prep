@@ -11,7 +11,7 @@ services:
     dockerContext: ./backend
     plan: free
     region: oregon
-    branch: master
+    branch: main
     healthCheckPath: /health
     envVars:
       - key: DATABASE_URL
@@ -38,7 +38,7 @@ services:
     dockerContext: ./frontend
     plan: free
     region: oregon
-    branch: master
+    branch: main
     envVars:
       - key: VITE_API_URL
         fromService:
