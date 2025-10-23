@@ -17,8 +17,10 @@ RUN if [ "$DB_PROVIDER" = "postgresql" ]; then \
 # Install dependencies
 RUN npm ci
 
-# Generate Prisma Client
+# Generate Prisma Client (with dummy DATABASE_URL for build)
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 RUN npx prisma generate
+ENV DATABASE_URL=""
 
 # Expose port
 EXPOSE 3000
