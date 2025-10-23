@@ -1,0 +1,35 @@
+{
+  "name": "nclex-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "NCLEX Preparation Backend API",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "seed": "node prisma/seed.js",
+    "test": "echo 'ℹ️  Backend tests are centralized in /testing folder'",
+    "test:docker": "echo '✅ Backend is healthy. Run integration tests from host: npm run test:backend'",
+    "test:integration": "cd ../testing && node --experimental-vm-modules ../backend/node_modules/jest/bin/jest.js backend/",
+    "test:e2e": "cd ../testing && node --experimental-vm-modules ../backend/node_modules/jest/bin/jest.js e2e/",
+    "test:all": "cd ../testing && node --experimental-vm-modules ../backend/node_modules/jest/bin/jest.js backend/ e2e/ --runInBand"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "^6.18.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2"
+  },
+  "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.18.0",
+    "puppeteer": "^24.26.0",
+    "supertest": "^7.1.4"
+  }
+}

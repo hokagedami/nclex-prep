@@ -1,0 +1,18 @@
+{
+  "name": "nclex-testing",
+  "version": "1.0.0",
+  "description": "Test suite for NCLEX Preparation Portal",
+  "type": "module",
+  "scripts": {
+    "test": "node --experimental-vm-modules ../backend/node_modules/jest/bin/jest.js --config jest.config.js",
+    "test:backend": "node --experimental-vm-modules ../backend/node_modules/jest/bin/jest.js backend/",
+    "test:e2e:puppeteer": "node --experimental-vm-modules ../backend/node_modules/jest/bin/jest.js e2e/",
+    "test:e2e": "cd ../frontend && npm run cypress:run",
+    "test:e2e:open": "cd ../frontend && npm run cypress",
+    "test:frontend": "cd ../frontend && npm test",
+    "test:all": "npm run test:backend && cd ../frontend && npm test && npm run cypress:run"
+  },
+  "keywords": ["testing", "nclex", "jest", "e2e"],
+  "author": "",
+  "license": "ISC"
+}

@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite" // Default provider (changed to "postgresql" during Docker build if needed)
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String       @id @default(uuid())
+  email            String       @unique
+  password         String
+  name             String
+  subscriptionTier String       @default("FREE")
+  points           Int          @default(0)
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  answers          UserAnswer[]
+}
+
+model Question {
+  id             String       @id @default(uuid())
+  content        String
+  type           String
+  category       String
+  difficulty     String
+  correctAnswers String
+  allAnswers     String
+  explanation    String
+  createdAt      DateTime     @default(now())
+  userAnswers    UserAnswer[]
+}
+
+model UserAnswer {
+  id              String   @id @default(uuid())
+  userId          String
+  questionId      String
+  selectedAnswers String
+  isCorrect       Boolean
+  pointsEarned    Int
+  timeSpent       Int
+  createdAt       DateTime @default(now())
+  user            User     @relation(fields: [userId], references: [id])
+  question        Question @relation(fields: [questionId], references: [id])
+}

@@ -1,0 +1,93 @@
+# NCLEX Preparation Portal - Docker Compose Configuration
+# Always starts PostgreSQL service
+# Backend chooses database via DATABASE_URL environment variable
+#
+# Usage:
+#   Start all services:  docker-compose up -d
+#   Use SQLite:          Set DATABASE_URL=file:./dev.db in backend/.env
+#   Use PostgreSQL:      Set DATABASE_URL=postgresql://... in backend/.env
+
+services:
+  # PostgreSQL Database (always available)
+  postgres:
+    image: postgres:16-alpine
+    container_name: nclex-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-nclex_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-nclex_password}
+      POSTGRES_DB: ${POSTGRES_DB:-nclex_db}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./backend/prisma/init-postgres.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - nclex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-nclex_user} -d ${POSTGRES_DB:-nclex_db}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+      args:
+        DB_PROVIDER: ${DB_PROVIDER:-postgresql}
+    container_name: nclex-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL:-postgresql://nclex_user:nclex_password@postgres:5432/nclex_db?schema=public}
+      - JWT_SECRET=${JWT_SECRET:-nclex-poc-secret-key-change-in-production-2025}
+      - PORT=3000
+      - NODE_ENV=${NODE_ENV:-production}
+    volumes:
+      - backend-data:/app/prisma
+    networks:
+      - nclex-network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: nclex-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - nclex-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  nclex-network:
+    driver: bridge
+
+volumes:
+  backend-data:
+    driver: local
+  postgres-data:
+    driver: local

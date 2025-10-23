@@ -1,0 +1,60 @@
+# Render Blueprint for NCLEX Preparation Portal
+# This file enables one-click deployment to Render.com
+# Just push to GitHub and connect to Render!
+
+services:
+  # Backend API Service
+  - type: web
+    name: nclex-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: ./backend
+    plan: free
+    region: oregon
+    branch: master
+    healthCheckPath: /health
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: nclex-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+        sync: false
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: DB_PROVIDER
+        value: postgresql
+    buildFilter:
+      paths:
+        - backend/**
+
+  # Frontend Service
+  - type: web
+    name: nclex-frontend
+    env: docker
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: ./frontend
+    plan: free
+    region: oregon
+    branch: master
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          type: web
+          name: nclex-backend
+          envVarKey: RENDER_EXTERNAL_URL
+    buildFilter:
+      paths:
+        - frontend/**
+
+# PostgreSQL Database
+databases:
+  - name: nclex-db
+    databaseName: nclex_db
+    user: nclex_user
+    plan: free
+    region: oregon
+    postgresMajorVersion: 15
